@@ -1,0 +1,6 @@
+#!/bin/bash
+if [ "$#" -ne 1 ]; then
+	echo "Usage: ./run some_script.py"
+	exit 1
+fi
+DJANGO_SETTINGS_MODULE=snoop.site.settings PYTHONPATH=../snoop python3 $1
