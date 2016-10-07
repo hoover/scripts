@@ -8,15 +8,15 @@ BUFSIZE = 1024 * 1024 # 1MB
 def slice(stream):
     last = b''
     while True:
-        buffer = last + stream.read(BUFSIZE)
+        window = last + stream.read(BUFSIZE)
         while True:
-            m = re.search(br'\n\r\n(From )', buffer)
+            m = re.search(br'\n\r\n(From )', window)
             if not m:
                 break
             offset = m.start(1)
-            yield buffer[:offset]
-            buffer = buffer[offset:]
-        last = buffer
+            yield window[:offset]
+            window = window[offset:]
+        last = window
     yield last
 
 def unpack(mbox_path, out_path):
