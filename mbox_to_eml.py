@@ -8,7 +8,10 @@ BUFSIZE = 1024 * 1024 # 1MB
 def slice(stream):
     last = b''
     while True:
-        window = last + stream.read(BUFSIZE)
+        buffer = stream.read(BUFSIZE)
+        if not buffer:
+            break
+        window = last + buffer
         while True:
             m = re.search(br'\n\r\n(From )', window)
             if not m:
