@@ -53,18 +53,18 @@ class Document:
 def _now():
     return datetime.utcnow().replace(tzinfo=timezone.utc)
 
-def write_index(index_file, prev, docs):
+def write_feed(feed_file, prev, docs):
     data = {'documents': [doc.summary() for doc in docs]}
     if prev:
         data['next'] = str(prev)
-    with index_file.open('w', encoding='utf-8') as f:
+    with feed_file.open('w', encoding='utf-8') as f:
         json.dump(data, f, sort_keys=True, indent=2)
 
 def main(repo):
     mofs = repo / 'mofs'
-    indexdir = repo / 'index'
+    feeddir = repo / 'feed'
     datadir = repo / 'data'
-    filename = lambda n: indexdir / '{}.json'.format(n)
+    filename = lambda n: feeddir / '{}.json'.format(n)
     for i, chunk in enumerate(chunked(sorted(mofs.iterdir())), 1):
         docs = [Document(i, _now()) for i in chunk]
         for doc in docs:
@@ -74,9 +74,9 @@ def main(repo):
                 continue
             with data_path.open('w', encoding='utf8') as f:
                 json.dump(doc.data(), f, sort_keys=True, indent=2)
-        prev = filename(i - 1).relative_to(index.parent) if i > 1 else None
-        index = filename(i)
-        write_index(index, prev, docs)
+        prev = filename(i - 1).relative_to(feed.parent) if i > 1 else None
+        feed = filename(i)
+        write_feed(feed, prev, docs)
 
 if __name__ == '__main__':
     import sys
