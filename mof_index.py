@@ -78,6 +78,10 @@ def main(repo):
         feed = filename(i)
         write_feed(feed, prev, docs)
 
+    latest = feeddir / 'latest.json'
+    if latest.exists(): latest.unlink()
+    latest.symlink_to(feed.relative_to(latest.parent))
+
 if __name__ == '__main__':
     import sys
     main(Path(sys.argv[1]))
