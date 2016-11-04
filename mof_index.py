@@ -20,15 +20,18 @@ class Document:
         self.id = path.stem
         self.timestamp = timestamp
 
+    def summary(self):
+        return {
+            'id': self.id,
+            'updated': self.timestamp.isoformat(),
+        }
+
 def write_index(index_file, prev, chunk):
     timestamp = datetime.utcnow().replace(tzinfo=timezone.utc)
-    data = {
-        'timestamp': timestamp.isoformat(),
-        'documents': {
-            doc.id: doc.timestamp.isoformat()
-            for doc in (Document(i, timestamp) for i in chunk)
-        },
-    }
+    data = {'documents': [
+        doc.summary()
+        for doc in (Document(i, timestamp) for i in chunk)
+    ]}
     if prev:
         data['next'] = str(prev)
     with index_file.open('w', encoding='utf-8') as f:
