@@ -14,13 +14,19 @@ def chunked(items, chunksize=100):
                 return
         yield buffer
 
+class Document:
+    def __init__(self, path, timestamp):
+        self.path = path
+        self.id = path.stem
+        self.timestamp = timestamp
+
 def write_index(index_file, prev, chunk):
     timestamp = datetime.utcnow().replace(tzinfo=timezone.utc)
     data = {
         'timestamp': timestamp.isoformat(),
         'documents': {
-            doc.stem: timestamp.isoformat()
-            for doc in chunk
+            doc.id: doc.timestamp.isoformat()
+            for doc in (Document(i, timestamp) for i in chunk)
         },
     }
     if prev:
