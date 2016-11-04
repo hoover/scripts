@@ -70,6 +70,8 @@ def main(repo):
         for doc in docs:
             data_path = datadir / doc.data_path()
             data_path.parent.mkdir(exist_ok=True, parents=True)
+            if data_path.exists():
+                continue
             with data_path.open('w', encoding='utf8') as f:
                 json.dump(doc.data(), f, sort_keys=True, indent=2)
         prev = filename(i - 1).relative_to(index.parent) if i > 1 else None
