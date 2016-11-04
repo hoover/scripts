@@ -26,11 +26,13 @@ class Document:
             'updated': self.timestamp.isoformat(),
         }
 
+def _now():
+    return datetime.utcnow().replace(tzinfo=timezone.utc)
+
 def write_index(index_file, prev, chunk):
-    timestamp = datetime.utcnow().replace(tzinfo=timezone.utc)
     data = {'documents': [
         doc.summary()
-        for doc in (Document(i, timestamp) for i in chunk)
+        for doc in (Document(i, _now()) for i in chunk)
     ]}
     if prev:
         data['next'] = str(prev)
