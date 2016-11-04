@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import re
 import json
+import subprocess
 
 ID_PATTERN = r'^mof(?P<part>\d)_(?P<year>\d{4})_(?P<number>\d+)$'
 
@@ -16,6 +17,10 @@ def chunked(items, chunksize=100):
             if not buffer:
                 return
         yield buffer
+
+def pdftotext(path):
+    cmd = ['pdftotext', str(path), '-']
+    return subprocess.check_output(cmd).decode('utf8')
 
 class Document:
     def __init__(self, path, timestamp):
@@ -35,6 +40,7 @@ class Document:
             'digest': {
                 'title': ("MOF partea {part}, nr {number} din {year}"
                     .format(**self.id_parts)),
+                'text': pdftotext(self.path),
             },
         }
 
