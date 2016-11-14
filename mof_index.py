@@ -25,13 +25,13 @@ def pdftotext(path):
 class Document:
     def __init__(self, path, timestamp):
         self.path = path
-        self.id = path.stem
         self.timestamp = timestamp
-        m = re.match(ID_PATTERN, self.id)
-        self.id_parts = dict(m.groupdict(), id=self.id)
+        m = re.match(ID_PATTERN, path.stem)
+        self.id_parts = dict(m.groupdict())
+        self.id = 'mof{part}/{year}/{number}'.format(**self.id_parts)
 
     def data_path(self):
-        return 'mof{part}/{year}/{id}.json'.format(**self.id_parts)
+        return self.id + '.json'
 
     def data(self):
         return {
