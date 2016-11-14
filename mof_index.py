@@ -66,12 +66,10 @@ def main(repo):
     datadir = repo / 'data'
     filename = lambda n: feeddir / '{}.json'.format(n)
     for i, chunk in enumerate(chunked(sorted(mofs.iterdir())), 1):
-        docs = [
-            Document(path, _now())
-            for path in chunk
-            if path.suffix == '.pdf'
-        ]
-        for doc in docs:
+        for path in chunk:
+            if path.suffix != '.pdf':
+                continue
+            doc = Document(path, _now())
             data_path = datadir / doc.data_path()
             data_path.parent.mkdir(exist_ok=True, parents=True)
             if data_path.exists():
