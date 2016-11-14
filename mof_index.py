@@ -36,7 +36,7 @@ class Document:
     def data(self):
         return {
             'id': self.id,
-            'updated': self.timestamp.isoformat(),
+            'version': self.timestamp.isoformat(),
             'content': {
                 'title': ("MOF partea {part}, nr {number} din {year}"
                     .format(**self.id_parts)),
@@ -47,7 +47,7 @@ class Document:
     def summary(self):
         return {
             'id': self.id,
-            'updated': self.timestamp.isoformat(),
+            'version': self.timestamp.isoformat(),
         }
 
 def _now():
