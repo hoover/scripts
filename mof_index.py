@@ -37,7 +37,7 @@ class Document:
         return {
             'id': self.id,
             'updated': self.timestamp.isoformat(),
-            'digest': {
+            'content': {
                 'title': ("MOF partea {part}, nr {number} din {year}"
                     .format(**self.id_parts)),
                 'text': pdftotext(self.path),
