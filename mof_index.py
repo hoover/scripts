@@ -23,31 +23,37 @@ def pdftotext(path):
     return subprocess.check_output(cmd).decode('utf8')
 
 class Document:
-    def __init__(self, path, timestamp):
+    def __init__(self, path, datadir):
         self.path = path
-        self.timestamp = timestamp
+        self.version = None
         m = re.match(ID_PATTERN, path.stem)
         self.id_parts = dict(m.groupdict())
         self.id = 'mof{part}/{year}/{number}'.format(**self.id_parts)
+        self.data_path = datadir / (self.id + '.json')
+        if self.data_path.exists():
+            with self.data_path.open('r', encoding='utf8') as f:
+                data = json.load(f)
+            self.version = data['version']
 
-    def data_path(self):
-        return self.id + '.json'
-
-    def data(self):
-        return {
+    def digest(self):
+        self.version = _now()
+        data = {
             'id': self.id,
-            'version': self.timestamp.isoformat(),
+            'version': self.version,
             'content': {
                 'title': ("MOF partea {part}, nr {number} din {year}"
                     .format(**self.id_parts)),
                 'text': pdftotext(self.path),
             },
         }
+        self.data_path.parent.mkdir(exist_ok=True, parents=True)
+        with self.data_path.open('w', encoding='utf8') as f:
+            json.dump(data, f, sort_keys=True, indent=2)
 
     def summary(self):
         return {
             'id': self.id,
-            'version': self.timestamp.isoformat(),
+            'version': self.version,
         }
 
 def _now():
@@ -66,17 +72,14 @@ def main(repo):
     datadir = repo / 'data'
     filename = lambda n: feeddir / '{}.json'.format(n)
     for i, chunk in enumerate(chunked(sorted(mofs.iterdir())), 1):
+        docs = []
         for path in chunk:
             if path.suffix != '.pdf':
                 continue
-            doc = Document(path, _now())
-            data_path = datadir / doc.data_path()
-            data_path.parent.mkdir(exist_ok=True, parents=True)
-            if data_path.exists():
-                continue
-            data = doc.data()
-            with data_path.open('w', encoding='utf8') as f:
-                json.dump(data, f, sort_keys=True, indent=2)
+            doc = Document(path, datadir)
+            if doc.version is None:
+                doc.digest()
+            docs.append(doc)
         prev = filename(i - 1).relative_to(feed.parent) if i > 1 else None
         feed = filename(i)
         write_feed(feed, prev, docs)
