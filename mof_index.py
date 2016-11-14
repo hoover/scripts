@@ -72,8 +72,9 @@ def main(repo):
             data_path.parent.mkdir(exist_ok=True, parents=True)
             if data_path.exists():
                 continue
+            data = doc.data()
             with data_path.open('w', encoding='utf8') as f:
-                json.dump(doc.data(), f, sort_keys=True, indent=2)
+                json.dump(data, f, sort_keys=True, indent=2)
         prev = filename(i - 1).relative_to(feed.parent) if i > 1 else None
         feed = filename(i)
         write_feed(feed, prev, docs)
