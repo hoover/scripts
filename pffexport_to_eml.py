@@ -4,6 +4,7 @@ import email
 import email.message
 import email.encoders
 from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
 
 def convert_email(folder, output):
     with (folder / 'InternetHeaders.txt').open('rb') as f:
@@ -13,6 +14,10 @@ def convert_email(folder, output):
     del message['Content-Type']
     message.set_payload(None)
     message['Content-Type'] = 'multipart/mixed'
+
+    with (folder / 'Message.html').open('r', encoding='utf8') as f:
+        html = MIMEText(f.read(), 'html')
+    message.attach(html)
 
     for p in (folder / 'Attachments').iterdir():
         attachment = MIMEBase('application', 'octet-stream')
