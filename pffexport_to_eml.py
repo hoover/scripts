@@ -43,9 +43,19 @@ def convert_email(folder, output):
 
     output.write(message.as_bytes())
 
+def convert_folder(folder, out_folder):
+    if not out_folder.exists():
+        out_folder.mkdir()
+    for message in folder.iterdir():
+        print(message.name)
+        out_message = out_folder / message.name
+        if out_message.exists():
+            continue
+        out_message_tmp = out_folder / (message.name + '.tmp')
+        with out_message_tmp.open('wb') as f:
+            convert_email(message, f)
+        out_message_tmp.rename(out_message)
+
 if __name__ == '__main__':
-    [folder] = sys.argv[1:]
-    from io import BytesIO
-    output = BytesIO()
-    convert_email(Path(folder), output)
-    print(output.getvalue().decode('latin1'))
+    [folder, out_folder] = sys.argv[1:]
+    convert_folder(Path(folder), Path(out_folder))
