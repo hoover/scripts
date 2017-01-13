@@ -15,9 +15,20 @@ def convert_email(folder, output):
     message.set_payload(None)
     message['Content-Type'] = 'multipart/mixed'
 
-    with (folder / 'Message.html').open('r', encoding='utf8') as f:
-        html = MIMEText(f.read(), 'html')
-    message.attach(html)
+    html_file = folder / 'Message.html'
+    text_file = folder / 'Message.txt'
+    if html_file.exists():
+        html = MIMEBase('text', 'html')
+        with html_file.open('rb') as f:
+            html.set_payload(f.read())
+        email.encoders.encode_base64(html)
+        message.attach(html)
+    elif text_file.exists():
+        text = MIMEBase('text', 'plain')
+        with text_file.open('rb') as f:
+            text.set_payload(f.read())
+        email.encoders.encode_base64(text)
+        message.attach(text)
 
     for p in (folder / 'Attachments').iterdir():
         attachment = MIMEBase('application', 'octet-stream')
