@@ -47,6 +47,8 @@ def convert_folder(folder, out_folder):
     if not out_folder.exists():
         out_folder.mkdir()
     for message in folder.iterdir():
+        if not message.name.startswith('Message'):
+            continue
         print(message.name)
         out_message = out_folder / message.name
         if out_message.exists():
