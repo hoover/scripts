@@ -30,14 +30,16 @@ def convert_email(folder, output):
         email.encoders.encode_base64(text)
         message.attach(text)
 
-    for p in (folder / 'Attachments').iterdir():
-        attachment = MIMEBase('application', 'octet-stream')
-        with p.open('rb') as f:
-            attachment.set_payload(f.read())
-        email.encoders.encode_base64(attachment)
-        attachment.add_header('Content-Disposition',
-            'attachment', filename=p.name)
-        message.attach(attachment)
+    attachments_dir = folder / 'Attachments'
+    if attachments_dir.exists():
+        for p in attachments_dir.iterdir():
+            attachment = MIMEBase('application', 'octet-stream')
+            with p.open('rb') as f:
+                attachment.set_payload(f.read())
+            email.encoders.encode_base64(attachment)
+            attachment.add_header('Content-Disposition',
+                'attachment', filename=p.name)
+            message.attach(attachment)
 
     output.write(message.as_bytes())
 
