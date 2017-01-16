@@ -67,7 +67,7 @@ def read_email(folder, output):
 def convert_message(message, out_folder):
     print(message)
     out_folder.mkdir(parents=True, exist_ok=True)
-    out_message = out_folder / message.name
+    out_message = out_folder / (message.name + '.eml')
     if out_message.exists():
         print('exists')
         return
