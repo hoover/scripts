@@ -6,6 +6,15 @@ import email.encoders
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 
+def get_file_attachment(p):
+    attachment = MIMEBase('application', 'octet-stream')
+    with p.open('rb') as f:
+        attachment.set_payload(f.read())
+    email.encoders.encode_base64(attachment)
+    attachment.add_header('Content-Disposition',
+        'attachment', filename=p.name)
+    return attachment
+
 def convert_email(folder, output):
     with (folder / 'InternetHeaders.txt').open('rb') as f:
         raw_headers = f.read()
@@ -33,13 +42,7 @@ def convert_email(folder, output):
     attachments_dir = folder / 'Attachments'
     if attachments_dir.exists():
         for p in attachments_dir.iterdir():
-            attachment = MIMEBase('application', 'octet-stream')
-            with p.open('rb') as f:
-                attachment.set_payload(f.read())
-            email.encoders.encode_base64(attachment)
-            attachment.add_header('Content-Disposition',
-                'attachment', filename=p.name)
-            message.attach(attachment)
+            message.attach(get_file_attachment(p))
 
     output.write(message.as_bytes())
 
