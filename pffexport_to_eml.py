@@ -79,6 +79,8 @@ def convert_folder(folder, out_folder):
     for item in folder.iterdir():
         if item.name.startswith('Message'):
             convert_message(item, out_folder)
+        elif item.name.startswith('Meeting'):
+            print('skipping meeting', item)
         else:
             convert_folder(item, out_folder / item.name)
 
