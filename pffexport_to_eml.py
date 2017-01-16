@@ -19,14 +19,14 @@ def get_file_attachment(p):
 def get_message_attachment(p):
     attachment = MIMEBase('message', 'rfc822')
     f = BytesIO()
-    convert_email(p, f)
+    read_email(p, f)
     attachment.set_payload(f.getvalue())
     email.encoders.encode_base64(attachment)
     attachment.add_header('Content-Disposition',
         'attachment', filename=p.name)
     return attachment
 
-def convert_email(folder, output):
+def read_email(folder, output):
     with (folder / 'InternetHeaders.txt').open('rb') as f:
         raw_headers = f.read()
 
@@ -76,7 +76,7 @@ def convert_folder(folder, out_folder):
             continue
         out_message_tmp = out_folder / (message.name + '.tmp')
         with out_message_tmp.open('wb') as f:
-            convert_email(message, f)
+            read_email(message, f)
         out_message_tmp.rename(out_message)
 
 if __name__ == '__main__':
