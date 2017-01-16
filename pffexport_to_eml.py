@@ -64,20 +64,23 @@ def read_email(folder, output):
 
     output.write(message.as_bytes())
 
-def convert_folder(folder, out_folder):
+def convert_message(message, out_folder):
+    print(message.name)
     if not out_folder.exists():
         out_folder.mkdir()
+    out_message = out_folder / message.name
+    if out_message.exists():
+        continue
+    out_message_tmp = out_folder / (message.name + '.tmp')
+    with out_message_tmp.open('wb') as f:
+        read_email(message, f)
+    out_message_tmp.rename(out_message)
+
+def convert_folder(folder, out_folder):
     for message in folder.iterdir():
         if not message.name.startswith('Message'):
             continue
-        print(message.name)
-        out_message = out_folder / message.name
-        if out_message.exists():
-            continue
-        out_message_tmp = out_folder / (message.name + '.tmp')
-        with out_message_tmp.open('wb') as f:
-            read_email(message, f)
-        out_message_tmp.rename(out_message)
+        convert_message(message, out_folder)
 
 if __name__ == '__main__':
     [folder, out_folder] = sys.argv[1:]
