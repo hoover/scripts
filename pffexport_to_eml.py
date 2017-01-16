@@ -5,11 +5,22 @@ import email.message
 import email.encoders
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
+from io import BytesIO
 
 def get_file_attachment(p):
     attachment = MIMEBase('application', 'octet-stream')
     with p.open('rb') as f:
         attachment.set_payload(f.read())
+    email.encoders.encode_base64(attachment)
+    attachment.add_header('Content-Disposition',
+        'attachment', filename=p.name)
+    return attachment
+
+def get_message_attachment(p):
+    attachment = MIMEBase('message', 'rfc822')
+    f = BytesIO()
+    convert_email(p, f)
+    attachment.set_payload(f.getvalue())
     email.encoders.encode_base64(attachment)
     attachment.add_header('Content-Disposition',
         'attachment', filename=p.name)
@@ -42,7 +53,14 @@ def convert_email(folder, output):
     attachments_dir = folder / 'Attachments'
     if attachments_dir.exists():
         for p in attachments_dir.iterdir():
-            message.attach(get_file_attachment(p))
+            if p.is_dir():
+                for i in p.iterdir():
+                    if i.name.startswith('Message'):
+                        message.attach(get_message_attachment(i))
+                    else:
+                        raise RuntimeError('unknown attachment {!r}'.format(i))
+            else:
+                message.attach(get_file_attachment(p))
 
     output.write(message.as_bytes())
 
