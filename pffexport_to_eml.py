@@ -69,6 +69,7 @@ def convert_message(message, out_folder):
     out_folder.mkdir(parents=True, exist_ok=True)
     out_message = out_folder / message.name
     if out_message.exists():
+        print('exists')
         return
     out_message_tmp = out_folder / (message.name + '.tmp')
     with out_message_tmp.open('wb') as f:
