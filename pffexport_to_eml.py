@@ -71,6 +71,9 @@ def convert_message(message, out_folder):
     if out_message.exists():
         print('exists')
         return
+    if not (message / 'InternetHeaders.txt').is_file():
+        print('no internet headers')
+        return
     out_message_tmp = out_folder / (message.name + '.tmp')
     with out_message_tmp.open('wb') as f:
         read_email(message, f)
