@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+import re
 import email
 import email.message
 import email.encoders
@@ -38,9 +39,12 @@ def read_email(folder, output):
     html_file = folder / 'Message.html'
     text_file = folder / 'Message.txt'
     if html_file.exists():
-        html = MIMEBase('text', 'html')
         with html_file.open('rb') as f:
-            html.set_payload(f.read())
+            html_src = f.read()
+        utf8 = bool(re.search(br'charset\s*=["\']?utf[-]?8', html_src[:1024]))
+        params = {'charset': 'utf-8'} if utf8 else {}
+        html = MIMEBase('text', 'html', **params)
+        html.set_payload(html_src)
         email.encoders.encode_base64(html)
         message.attach(html)
     elif text_file.exists():
