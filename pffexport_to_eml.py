@@ -79,14 +79,17 @@ def convert_message(message, out_folder):
         read_email(message, f)
     out_message_tmp.rename(out_message)
 
+def convert_item(item, out_folder):
+    if item.name.startswith('Message'):
+        convert_message(item, out_folder)
+    elif item.name.startswith('Meeting'):
+        print('skipping meeting', item)
+    else:
+        convert_folder(item, out_folder / item.name)
+
 def convert_folder(folder, out_folder):
     for item in folder.iterdir():
-        if item.name.startswith('Message'):
-            convert_message(item, out_folder)
-        elif item.name.startswith('Meeting'):
-            print('skipping meeting', item)
-        else:
-            convert_folder(item, out_folder / item.name)
+        convert_item(item, out_folder)
 
 if __name__ == '__main__':
     [folder, out_folder] = sys.argv[1:]
