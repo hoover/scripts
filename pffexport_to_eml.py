@@ -1,3 +1,12 @@
+"""
+Convert the output of pffexport to .eml files
+
+Usage: `python3 pffexport_to_eml.py export out_folder`
+
+It creates an `export` folder inside `out_folder`. It can convert individual
+messages or entire folder hierarchies.
+"""
+
 import sys
 from pathlib import Path
 import re
