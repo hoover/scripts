@@ -92,5 +92,5 @@ def convert_folder(folder, out_folder):
         convert_item(item, out_folder)
 
 if __name__ == '__main__':
-    [folder, out_folder] = sys.argv[1:]
-    convert_folder(Path(folder), Path(out_folder))
+    [item, out_folder] = sys.argv[1:]
+    convert_item(Path(item), Path(out_folder))
